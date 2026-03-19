@@ -1,0 +1,13 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Gerador de Plano de Aula",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Plano Aula",
+  "start_url": "/\"start_url\": \"/app-plano-aula/\"",
+  "theme_color": "#2d89ef",
+  "id": "Gerador de Plano de Aula",
+  "lang": "pt"
+}
