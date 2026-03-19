@@ -1,201 +1,719 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador de Plano de Aula</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Plano de Aula</title>
+  <style>
+    * { box-sizing: border-box; }
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #f4f6f8;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #222;
+    }
 
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 15px;
-}
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+    }
 
-.card {
-  background: white;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-}
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+    }
 
-input, select, textarea, button {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-}
+    h1, h2, h3 {
+      margin-top: 0;
+    }
 
-button {
-  background: #2d89ef;
-  color: white;
-  border: none;
-}
+    .sub {
+      color: #666;
+      margin-bottom: 14px;
+    }
 
-.result {
-  background: #eee;
-  padding: 10px;
-  min-height: 150px;
-}
-</style>
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
 
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+      margin-bottom: 12px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      background: #2d89ef;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .secondary { background: #6b7280; }
+    .danger { background: #d64545; }
+    .success { background: #1f9d55; }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .result {
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      white-space: pre-wrap;
+      min-height: 240px;
+      overflow-wrap: anywhere;
+    }
+
+    .examples {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .example-card,
+    .saved-card {
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .saved-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .saved-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .saved-actions button {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .grid, .grid-3, .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid, .grid-3, .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .container { padding: 12px; }
+      .card { padding: 14px; }
+      h1 { font-size: 24px; }
+      h2 { font-size: 20px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <div class="card">
+      <h1>Gerador de Plano de Aula</h1>
+      <p class="sub">Crie, edite, salve, imprima e baixe planos de aula.</p>
 
-<div class="container">
+      <h2>Exemplos prontos</h2>
+      <select id="materiaExemplo" onchange="carregarExemplosMateria()">
+        <option value="">Escolha uma matéria</option>
+        <option value="Português">Português</option>
+        <option value="Matemática">Matemática</option>
+        <option value="Ciências">Ciências</option>
+        <option value="História">História</option>
+        <option value="Geografia">Geografia</option>
+        <option value="Artes">Artes</option>
+        <option value="Educação Infantil">Educação Infantil</option>
+        <option value="Curso Profissionalizante">Curso Profissionalizante</option>
+      </select>
+      <div id="listaExemplos" class="examples"></div>
+    </div>
 
-<h1>Gerador de Plano de Aula</h1>
+    <div class="card">
+      <h2>Formulário</h2>
 
-<select id="materiaExemplo" onchange="carregarExemplo()">
-<option value="">Escolher exemplo</option>
-<option value="portugues">Português</option>
-<option value="matematica">Matemática</option>
-<option value="ciencias">Ciências</option>
-<option value="historia">História</option>
-<option value="geografia">Geografia</option>
-<option value="artes">Artes</option>
-<option value="infantil">Educação Infantil</option>
-<option value="profissional">Curso Profissionalizante</option>
-</select>
+      <div class="grid">
+        <input id="disciplina" placeholder="Disciplina">
+        <input id="tema" placeholder="Tema da aula">
+      </div>
 
-<input id="disciplina" placeholder="Disciplina">
-<input id="tema" placeholder="Tema">
-<input id="publico" placeholder="Público">
-<input id="duracao" placeholder="Duração">
-<input id="objetivo" placeholder="Objetivo">
-<textarea id="conteudo" placeholder="Conteúdo"></textarea>
-<input id="materiais" placeholder="Materiais">
-<input id="atividade" placeholder="Atividade">
+      <div class="grid-3">
+        <select id="publico">
+          <option value="">Selecione o público-alvo</option>
+          <option>Educação Infantil</option>
+          <option>Ensino Fundamental</option>
+          <option>Ensino Médio</option>
+          <option>Curso Profissionalizante</option>
+          <option>Adultos</option>
+        </select>
 
-<button onclick="gerarPlano()">Gerar Plano</button>
-<button onclick="baixarPDF()">Baixar PDF</button>
+        <input id="anoSerie" placeholder="Ano/Série">
 
-<div id="resultado" class="result"></div>
+        <select id="modelo">
+          <option value="">Selecione o tipo de aula</option>
+          <option>Aula expositiva</option>
+          <option>Aula prática</option>
+          <option>Oficina</option>
+          <option>Reforço escolar</option>
+          <option>Projeto</option>
+        </select>
+      </div>
 
-</div>
+      <div class="grid-3">
+        <input id="duracao" placeholder="Duração da aula">
+        <input id="objetivo" placeholder="Objetivo geral">
+        <input id="bncc" placeholder="BNCC / Competência / Habilidade">
+      </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+      <div class="grid">
+        <textarea id="conteudo" placeholder="Conteúdo"></textarea>
+        <textarea id="materiais" placeholder="Materiais"></textarea>
+      </div>
 
-<script>
+      <textarea id="atividade" placeholder="Atividade principal"></textarea>
 
-function carregarExemplo() {
-  let tipo = document.getElementById("materiaExemplo").value;
+      <div class="toolbar">
+        <button onclick="gerarPlano()">Gerar plano</button>
+        <button class="success" onclick="salvarPlano()">Salvar plano</button>
+        <button onclick="copiarPlano()">Copiar</button>
+        <button onclick="baixarPDF()">Baixar PDF</button>
+        <button class="secondary" onclick="imprimirPlano()">Imprimir</button>
+      </div>
 
-  if (tipo === "portugues") {
-    disciplina.value = "Português";
-    tema.value = "Produção de texto";
-    publico.value = "Fundamental";
-  }
+      <div class="toolbar">
+        <button class="secondary" onclick="limparCampos()">Limpar</button>
+      </div>
+    </div>
 
-  if (tipo === "matematica") {
-    disciplina.value = "Matemática";
-    tema.value = "Adição e subtração";
-    publico.value = "Fundamental";
-  }
+    <div class="card">
+      <h2>Plano gerado</h2>
+      <div id="resultado" class="result">Seu plano aparecerá aqui...</div>
+    </div>
 
-  if (tipo === "ciencias") {
-    disciplina.value = "Ciências";
-    tema.value = "Sistema solar";
-    publico.value = "Fundamental";
-  }
+    <div class="card">
+      <h2>Planos salvos</h2>
 
-  if (tipo === "historia") {
-    disciplina.value = "História";
-    tema.value = "Descobrimento do Brasil";
-    publico.value = "Fundamental";
-  }
+      <div class="grid">
+        <input id="busca" placeholder="Buscar por disciplina ou tema" oninput="atualizarPlanosSalvos()">
 
-  if (tipo === "geografia") {
-    disciplina.value = "Geografia";
-    tema.value = "Meios de transporte";
-    publico.value = "Fundamental";
-  }
+        <select id="filtroPublico" onchange="atualizarPlanosSalvos()">
+          <option value="">Filtrar por público</option>
+          <option>Educação Infantil</option>
+          <option>Ensino Fundamental</option>
+          <option>Ensino Médio</option>
+          <option>Curso Profissionalizante</option>
+          <option>Adultos</option>
+        </select>
+      </div>
 
-  if (tipo === "artes") {
-    disciplina.value = "Artes";
-    tema.value = "Pintura livre";
-    publico.value = "Fundamental";
-  }
+      <div id="planosSalvos"></div>
+    </div>
+  </div>
 
-  if (tipo === "infantil") {
-    disciplina.value = "Educação Infantil";
-    tema.value = "Cores e formas";
-    publico.value = "Infantil";
-  }
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const exemplosPorMateria = {
+      "Português": [
+        {
+          titulo: "Produção de texto",
+          disciplina: "Português",
+          tema: "Produção de texto",
+          publico: "Ensino Fundamental",
+          anoSerie: "5º ano",
+          modelo: "Aula prática",
+          duracao: "2 horas",
+          objetivo: "Desenvolver a escrita, criatividade e organização de ideias.",
+          conteudo: "Produção textual e interpretação.",
+          materiais: "Caderno, lápis, borracha, folhas e quadro.",
+          atividade: "Escrita de um pequeno texto com tema proposto.",
+          bncc: "EF15LP05"
+        }
+      ],
+      "Matemática": [
+        {
+          titulo: "Adição e subtração",
+          disciplina: "Matemática",
+          tema: "Adição e subtração",
+          publico: "Ensino Fundamental",
+          anoSerie: "3º ano",
+          modelo: "Aula prática",
+          duracao: "1 hora",
+          objetivo: "Compreender e resolver operações simples.",
+          conteudo: "Adição e subtração.",
+          materiais: "Caderno, lápis, fichas e quadro.",
+          atividade: "Resolução de continhas e desafios matemáticos.",
+          bncc: "EF03MA05"
+        }
+      ],
+      "Ciências": [
+        {
+          titulo: "Sistema solar",
+          disciplina: "Ciências",
+          tema: "Sistema solar",
+          publico: "Ensino Fundamental",
+          anoSerie: "5º ano",
+          modelo: "Aula expositiva",
+          duracao: "2 horas",
+          objetivo: "Conhecer os planetas e a organização do sistema solar.",
+          conteudo: "Planetas, Sol e movimentos.",
+          materiais: "Cartazes, imagens, caderno e lápis.",
+          atividade: "Montagem de maquete simples do sistema solar.",
+          bncc: "EF05CI10"
+        }
+      ],
+      "História": [
+        {
+          titulo: "Descobrimento do Brasil",
+          disciplina: "História",
+          tema: "Descobrimento do Brasil",
+          publico: "Ensino Fundamental",
+          anoSerie: "5º ano",
+          modelo: "Aula expositiva",
+          duracao: "1 hora",
+          objetivo: "Compreender fatos históricos importantes do Brasil.",
+          conteudo: "Contexto histórico do descobrimento.",
+          materiais: "Livro, quadro e imagens.",
+          atividade: "Leitura, explicação e roda de conversa.",
+          bncc: "EF05HI01"
+        }
+      ],
+      "Geografia": [
+        {
+          titulo: "Meios de transporte",
+          disciplina: "Geografia",
+          tema: "Meios de transporte",
+          publico: "Ensino Fundamental",
+          anoSerie: "2º ano",
+          modelo: "Aula prática",
+          duracao: "1 hora",
+          objetivo: "Identificar diferentes meios de transporte e sua utilidade.",
+          conteudo: "Transportes terrestres, aéreos e aquáticos.",
+          materiais: "Figuras, cartolina e lápis de cor.",
+          atividade: "Separação e colagem de imagens por categoria.",
+          bncc: "EF02GE03"
+        }
+      ],
+      "Artes": [
+        {
+          titulo: "Pintura livre",
+          disciplina: "Artes",
+          tema: "Expressão artística",
+          publico: "Ensino Fundamental",
+          anoSerie: "1º ao 3º ano",
+          modelo: "Oficina",
+          duracao: "2 horas",
+          objetivo: "Estimular a criatividade e a expressão artística.",
+          conteudo: "Cores, formas e pintura.",
+          materiais: "Tinta, pincel, papel e avental.",
+          atividade: "Produção de pintura livre.",
+          bncc: "EF15AR04"
+        }
+      ],
+      "Educação Infantil": [
+        {
+          titulo: "Cores e formas",
+          disciplina: "Educação Infantil",
+          tema: "Cores e formas",
+          publico: "Educação Infantil",
+          anoSerie: "Maternal",
+          modelo: "Aula prática",
+          duracao: "1 hora",
+          objetivo: "Reconhecer cores e formas de maneira lúdica.",
+          conteudo: "Identificação de cores e formas.",
+          materiais: "Cartazes, blocos coloridos e figuras.",
+          atividade: "Brincadeiras de associação de cores e formas.",
+          bncc: "EI03ET05"
+        }
+      ],
+      "Curso Profissionalizante": [
+        {
+          titulo: "Atendimento ao cliente",
+          disciplina: "Curso Profissionalizante",
+          tema: "Atendimento ao cliente",
+          publico: "Curso Profissionalizante",
+          anoSerie: "Turma A",
+          modelo: "Aula prática",
+          duracao: "2 horas",
+          objetivo: "Desenvolver noções de atendimento e comunicação profissional.",
+          conteudo: "Atendimento, postura e comunicação.",
+          materiais: "Caderno, caneta e roteiro impresso.",
+          atividade: "Simulação de atendimento ao cliente.",
+          bncc: ""
+        }
+      ]
+    };
 
-  if (tipo === "profissional") {
-    disciplina.value = "Curso Profissionalizante";
-    tema.value = "Atendimento ao cliente";
-    publico.value = "Adultos";
-  }
-}
-  let tipo = document.getElementById("materiaExemplo").value;
+    let planos = JSON.parse(localStorage.getItem("planosDeAula")) || [];
+    let indiceEdicao = null;
 
-  if (tipo === "portugues") {
-    document.getElementById("disciplina").value = "Português";
-    document.getElementById("tema").value = "Produção de texto";
-    document.getElementById("publico").value = "Fundamental";
-  }
+    function carregarExemplosMateria() {
+      const materia = document.getElementById("materiaExemplo").value;
+      const lista = document.getElementById("listaExemplos");
+      lista.innerHTML = "";
 
-  if (tipo === "matematica") {
-    document.getElementById("disciplina").value = "Matemática";
-    document.getElementById("tema").value = "Adição";
-    document.getElementById("publico").value = "Fundamental";
-  }
-}
+      if (!materia || !exemplosPorMateria[materia]) return;
 
-function gerarPlano() {
-  let d = document.getElementById("disciplina").value;
-  let t = document.getElementById("tema").value;
-  let p = document.getElementById("publico").value;
-  let du = document.getElementById("duracao").value;
-  let o = document.getElementById("objetivo").value;
-  let c = document.getElementById("conteudo").value;
-  let m = document.getElementById("materiais").value;
-  let a = document.getElementById("atividade").value;
+      exemplosPorMateria[materia].forEach((exemplo, index) => {
+        const card = document.createElement("div");
+        card.className = "example-card";
+        card.innerHTML = `
+          <h3>${exemplo.titulo}</h3>
+          <div class="muted">${exemplo.publico} | ${exemplo.anoSerie}</div>
+          <p><strong>Tema:</strong> ${exemplo.tema}</p>
+          <button onclick="usarExemplo('${materia}', ${index})">Usar este exemplo</button>
+        `;
+        lista.appendChild(card);
+      });
+    }
 
-  let plano = `
-PLANO DE AULA
+    function usarExemplo(materia, index) {
+      const exemplo = exemplosPorMateria[materia][index];
 
-Disciplina: ${d}
-Tema: ${t}
-Público: ${p}
-Duração: ${du}
+      document.getElementById("disciplina").value = exemplo.disciplina;
+      document.getElementById("tema").value = exemplo.tema;
+      document.getElementById("publico").value = exemplo.publico;
+      document.getElementById("anoSerie").value = exemplo.anoSerie;
+      document.getElementById("modelo").value = exemplo.modelo;
+      document.getElementById("duracao").value = exemplo.duracao;
+      document.getElementById("objetivo").value = exemplo.objetivo;
+      document.getElementById("conteudo").value = exemplo.conteudo;
+      document.getElementById("materiais").value = exemplo.materiais;
+      document.getElementById("atividade").value = exemplo.atividade;
+      document.getElementById("bncc").value = exemplo.bncc || "";
 
-Objetivo:
-${o}
+      gerarPlano();
+    }
+
+    function gerarMetodologia(publico, modelo) {
+      if (modelo === "Aula expositiva") {
+        return "A aula será desenvolvida por meio de explicação dialogada, apresentação do tema, exemplos práticos e participação dos alunos.";
+      }
+      if (modelo === "Aula prática") {
+        return "A aula será conduzida com demonstração prática, execução orientada e acompanhamento passo a passo.";
+      }
+      if (modelo === "Oficina") {
+        return "A aula será realizada em formato de oficina, com participação ativa, prática guiada e construção coletiva do conhecimento.";
+      }
+      if (modelo === "Reforço escolar") {
+        return "A aula será focada na retomada dos conteúdos, esclarecimento de dúvidas, exercícios dirigidos e acompanhamento individual.";
+      }
+      if (modelo === "Projeto") {
+        return "A aula será organizada em etapas com planejamento, participação ativa, produção prática e socialização dos resultados.";
+      }
+      return "A aula será organizada em etapas, com explicação inicial, desenvolvimento prático e participação ativa dos alunos.";
+    }
+
+    function gerarAvaliacao(publico, modelo) {
+      if (publico === "Educação Infantil") {
+        return "A avaliação será realizada por observação da participação, interação, interesse e realização das atividades.";
+      }
+      if (publico === "Curso Profissionalizante") {
+        return "A avaliação será feita por meio da execução prática, participação, desenvolvimento da habilidade e resultado apresentado.";
+      }
+      if (modelo === "Projeto") {
+        return "A avaliação será feita considerando participação, desenvolvimento das etapas propostas, envolvimento e resultado final do projeto.";
+      }
+      return "A avaliação será realizada com base na participação, compreensão do conteúdo, envolvimento e execução das atividades propostas.";
+    }
+
+    function gerarPlano() {
+      const disciplina = document.getElementById("disciplina").value.trim();
+      const tema = document.getElementById("tema").value.trim();
+      const publico = document.getElementById("publico").value.trim();
+      const anoSerie = document.getElementById("anoSerie").value.trim();
+      const modelo = document.getElementById("modelo").value.trim();
+      const duracao = document.getElementById("duracao").value.trim();
+      const objetivo = document.getElementById("objetivo").value.trim();
+      const conteudo = document.getElementById("conteudo").value.trim();
+      const materiais = document.getElementById("materiais").value.trim();
+      const atividade = document.getElementById("atividade").value.trim();
+      const bncc = document.getElementById("bncc").value.trim();
+
+      if (!disciplina || !tema || !publico || !anoSerie || !modelo || !duracao || !objetivo || !conteudo || !materiais || !atividade) {
+        document.getElementById("resultado").innerText = "Preencha todos os campos obrigatórios para gerar o plano.";
+        return;
+      }
+
+      const metodologia = gerarMetodologia(publico, modelo);
+      const avaliacao = gerarAvaliacao(publico, modelo);
+      const blocoBncc = bncc ? `BNCC / Competência / Habilidade:\n${bncc}\n\n` : "";
+
+      const plano = `PLANO DE AULA
+
+Disciplina: ${disciplina}
+Tema: ${tema}
+Público-alvo: ${publico}
+Ano/Série: ${anoSerie}
+Tipo de aula: ${modelo}
+Duração: ${duracao}
+
+${blocoBncc}Objetivo Geral:
+${objetivo}
 
 Conteúdo:
-${c}
+${conteudo}
 
 Materiais:
-${m}
+${materiais}
 
-Atividade:
-${a}
-`;
+Metodologia:
+${metodologia}
 
-  document.getElementById("resultado").innerText = plano;
-}
+Desenvolvimento da Aula:
+1. Acolhida e apresentação do tema: ${tema}.
+2. Introdução ao conteúdo: ${conteudo}.
+3. Organização dos materiais necessários: ${materiais}.
+4. Execução da atividade principal: ${atividade}.
+5. Acompanhamento, orientação e esclarecimento de dúvidas.
+6. Revisão final dos pontos trabalhados.
+7. Encerramento da aula.
 
-function baixarPDF() {
-  let texto = document.getElementById("resultado").innerText;
+Avaliação:
+${avaliacao}
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+Observações:
+Plano gerado automaticamente pelo aplicativo.`;
 
-  let linhas = doc.splitTextToSize(texto, 180);
-  doc.text(linhas, 10, 10);
+      document.getElementById("resultado").innerText = plano;
+    }
 
-  doc.save("plano.pdf");
-}
+    function salvarPlano() {
+      const texto = document.getElementById("resultado").innerText;
 
-</script>
+      if (!texto || texto === "Seu plano aparecerá aqui..." || texto === "Preencha todos os campos obrigatórios para gerar o plano.") {
+        alert("Gere um plano antes de salvar.");
+        return;
+      }
 
+      const planoObj = {
+        titulo: document.getElementById("disciplina").value.trim() + " - " + document.getElementById("tema").value.trim(),
+        disciplina: document.getElementById("disciplina").value.trim(),
+        tema: document.getElementById("tema").value.trim(),
+        publico: document.getElementById("publico").value.trim(),
+        anoSerie: document.getElementById("anoSerie").value.trim(),
+        modelo: document.getElementById("modelo").value.trim(),
+        duracao: document.getElementById("duracao").value.trim(),
+        objetivo: document.getElementById("objetivo").value.trim(),
+        conteudo: document.getElementById("conteudo").value.trim(),
+        materiais: document.getElementById("materiais").value.trim(),
+        atividade: document.getElementById("atividade").value.trim(),
+        bncc: document.getElementById("bncc").value.trim(),
+        texto: texto
+      };
+
+      if (indiceEdicao === null) {
+        planos.push(planoObj);
+        alert("Plano salvo com sucesso!");
+      } else {
+        planos[indiceEdicao] = planoObj;
+        indiceEdicao = null;
+        alert("Plano atualizado com sucesso!");
+      }
+
+      localStorage.setItem("planosDeAula", JSON.stringify(planos));
+      atualizarPlanosSalvos();
+      limparCampos();
+    }
+
+    function atualizarPlanosSalvos() {
+      const busca = (document.getElementById("busca")?.value || "").toLowerCase();
+      const filtroPublico = document.getElementById("filtroPublico")?.value || "";
+      const area = document.getElementById("planosSalvos");
+      area.innerHTML = "";
+
+      const filtrados = planos.filter(plano => {
+        const passaBusca =
+          !busca ||
+          plano.titulo.toLowerCase().includes(busca) ||
+          plano.tema.toLowerCase().includes(busca);
+
+        const passaPublico = !filtroPublico || plano.publico === filtroPublico;
+        return passaBusca && passaPublico;
+      });
+
+      if (filtrados.length === 0) {
+        area.innerHTML = '<div class="saved-card">Nenhum plano salvo ainda.</div>';
+        return;
+      }
+
+      filtrados.forEach(plano => {
+        const indexOriginal = planos.findIndex(
+          p => p.titulo === plano.titulo && p.texto === plano.texto
+        );
+
+        const card = document.createElement("div");
+        card.className = "saved-card";
+        card.innerHTML = `
+          <div class="saved-top">
+            <div>
+              <strong>${plano.titulo}</strong><br>
+              <span class="muted">${plano.publico} | ${plano.anoSerie}</span>
+            </div>
+            <div class="saved-actions">
+              <button onclick="verPlano(${indexOriginal})">Ver</button>
+              <button class="success" onclick="editarPlano(${indexOriginal})">Editar</button>
+              <button class="danger" onclick="excluirPlano(${indexOriginal})">Excluir</button>
+            </div>
+          </div>
+        `;
+        area.appendChild(card);
+      });
+    }
+
+    function verPlano(index) {
+      document.getElementById("resultado").innerText = planos[index].texto;
+    }
+
+    function editarPlano(index) {
+      const plano = planos[index];
+
+      document.getElementById("disciplina").value = plano.disciplina;
+      document.getElementById("tema").value = plano.tema;
+      document.getElementById("publico").value = plano.publico;
+      document.getElementById("anoSerie").value = plano.anoSerie;
+      document.getElementById("modelo").value = plano.modelo;
+      document.getElementById("duracao").value = plano.duracao;
+      document.getElementById("objetivo").value = plano.objetivo;
+      document.getElementById("conteudo").value = plano.conteudo;
+      document.getElementById("materiais").value = plano.materiais;
+      document.getElementById("atividade").value = plano.atividade;
+      document.getElementById("bncc").value = plano.bncc || "";
+      document.getElementById("resultado").innerText = plano.texto;
+
+      indiceEdicao = index;
+      alert("Plano carregado para edição.");
+    }
+
+    function excluirPlano(index) {
+      if (!confirm("Deseja realmente excluir este plano?")) return;
+
+      planos.splice(index, 1);
+      localStorage.setItem("planosDeAula", JSON.stringify(planos));
+      atualizarPlanosSalvos();
+      alert("Plano excluído com sucesso!");
+    }
+
+    function copiarPlano() {
+      const texto = document.getElementById("resultado").innerText;
+
+      if (!texto || texto === "Seu plano aparecerá aqui...") {
+        alert("Gere um plano antes de copiar.");
+        return;
+      }
+
+      navigator.clipboard.writeText(texto)
+        .then(() => alert("Plano copiado com sucesso!"))
+        .catch(() => alert("Não foi possível copiar."));
+    }
+
+    function baixarPDF() {
+      const texto = document.getElementById("resultado").innerText;
+
+      if (!texto || texto === "Seu plano aparecerá aqui...") {
+        alert("Gere um plano antes de baixar em PDF.");
+        return;
+      }
+
+      if (typeof window.jspdf === "undefined") {
+        alert("Biblioteca PDF não carregada.");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const linhas = doc.splitTextToSize(texto, 180);
+      let posY = 10;
+
+      linhas.forEach((linha) => {
+        if (posY > 280) {
+          doc.addPage();
+          posY = 10;
+        }
+        doc.text(linha, 10, posY);
+        posY += 7;
+      });
+
+      doc.save("plano-de-aula.pdf");
+    }
+
+    function imprimirPlano() {
+      const texto = document.getElementById("resultado").innerText;
+
+      if (!texto || texto === "Seu plano aparecerá aqui...") {
+        alert("Gere um plano primeiro.");
+        return;
+      }
+
+      const novaJanela = window.open("", "", "width=900,height=700");
+      novaJanela.document.write('<pre style="white-space:pre-wrap;font-family:Arial;padding:20px;">' + texto + "</pre>");
+      novaJanela.document.close();
+      novaJanela.print();
+    }
+
+    function limparCampos() {
+      document.getElementById("disciplina").value = "";
+      document.getElementById("tema").value = "";
+      document.getElementById("publico").value = "";
+      document.getElementById("anoSerie").value = "";
+      document.getElementById("modelo").value = "";
+      document.getElementById("duracao").value = "";
+      document.getElementById("objetivo").value = "";
+      document.getElementById("conteudo").value = "";
+      document.getElementById("materiais").value = "";
+      document.getElementById("atividade").value = "";
+      document.getElementById("bncc").value = "";
+      document.getElementById("resultado").innerText = "Seu plano aparecerá aqui...";
+      indiceEdicao = null;
+    }
+
+    atualizarPlanosSalvos();
+  </script>
 </body>
 </html>
