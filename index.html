@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Plano de Aula</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f4f6f8;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 15px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+input, select, textarea, button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  background: #2d89ef;
+  color: white;
+  border: none;
+}
+
+.result {
+  background: #eee;
+  padding: 10px;
+  min-height: 150px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>Gerador de Plano de Aula</h1>
+
+<select id="materiaExemplo" onchange="carregarExemplo()">
+<option value="">Escolher exemplo</option>
+<option value="portugues">Português</option>
+<option value="matematica">Matemática</option>
+</select>
+
+<input id="disciplina" placeholder="Disciplina">
+<input id="tema" placeholder="Tema">
+<input id="publico" placeholder="Público">
+<input id="duracao" placeholder="Duração">
+<input id="objetivo" placeholder="Objetivo">
+<textarea id="conteudo" placeholder="Conteúdo"></textarea>
+<input id="materiais" placeholder="Materiais">
+<input id="atividade" placeholder="Atividade">
+
+<button onclick="gerarPlano()">Gerar Plano</button>
+<button onclick="baixarPDF()">Baixar PDF</button>
+
+<div id="resultado" class="result"></div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+
+function carregarExemplo() {
+  let tipo = document.getElementById("materiaExemplo").value;
+
+  if (tipo === "portugues") {
+    document.getElementById("disciplina").value = "Português";
+    document.getElementById("tema").value = "Produção de texto";
+    document.getElementById("publico").value = "Fundamental";
+  }
+
+  if (tipo === "matematica") {
+    document.getElementById("disciplina").value = "Matemática";
+    document.getElementById("tema").value = "Adição";
+    document.getElementById("publico").value = "Fundamental";
+  }
+}
+
+function gerarPlano() {
+  let d = document.getElementById("disciplina").value;
+  let t = document.getElementById("tema").value;
+  let p = document.getElementById("publico").value;
+  let du = document.getElementById("duracao").value;
+  let o = document.getElementById("objetivo").value;
+  let c = document.getElementById("conteudo").value;
+  let m = document.getElementById("materiais").value;
+  let a = document.getElementById("atividade").value;
+
+  let plano = `
+PLANO DE AULA
+
+Disciplina: ${d}
+Tema: ${t}
+Público: ${p}
+Duração: ${du}
+
+Objetivo:
+${o}
+
+Conteúdo:
+${c}
+
+Materiais:
+${m}
+
+Atividade:
+${a}
+`;
+
+  document.getElementById("resultado").innerText = plano;
+}
+
+function baixarPDF() {
+  let texto = document.getElementById("resultado").innerText;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  let linhas = doc.splitTextToSize(texto, 180);
+  doc.text(linhas, 10, 10);
+
+  doc.save("plano.pdf");
+}
+
+</script>
+
+</body>
+</html>
