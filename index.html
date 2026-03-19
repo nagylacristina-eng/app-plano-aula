@@ -55,6 +55,12 @@ button {
 <option value="">Escolher exemplo</option>
 <option value="portugues">Português</option>
 <option value="matematica">Matemática</option>
+<option value="ciencias">Ciências</option>
+<option value="historia">História</option>
+<option value="geografia">Geografia</option>
+<option value="artes">Artes</option>
+<option value="infantil">Educação Infantil</option>
+<option value="profissional">Curso Profissionalizante</option>
 </select>
 
 <input id="disciplina" placeholder="Disciplina">
@@ -78,6 +84,56 @@ button {
 <script>
 
 function carregarExemplo() {
+  let tipo = document.getElementById("materiaExemplo").value;
+
+  if (tipo === "portugues") {
+    disciplina.value = "Português";
+    tema.value = "Produção de texto";
+    publico.value = "Fundamental";
+  }
+
+  if (tipo === "matematica") {
+    disciplina.value = "Matemática";
+    tema.value = "Adição e subtração";
+    publico.value = "Fundamental";
+  }
+
+  if (tipo === "ciencias") {
+    disciplina.value = "Ciências";
+    tema.value = "Sistema solar";
+    publico.value = "Fundamental";
+  }
+
+  if (tipo === "historia") {
+    disciplina.value = "História";
+    tema.value = "Descobrimento do Brasil";
+    publico.value = "Fundamental";
+  }
+
+  if (tipo === "geografia") {
+    disciplina.value = "Geografia";
+    tema.value = "Meios de transporte";
+    publico.value = "Fundamental";
+  }
+
+  if (tipo === "artes") {
+    disciplina.value = "Artes";
+    tema.value = "Pintura livre";
+    publico.value = "Fundamental";
+  }
+
+  if (tipo === "infantil") {
+    disciplina.value = "Educação Infantil";
+    tema.value = "Cores e formas";
+    publico.value = "Infantil";
+  }
+
+  if (tipo === "profissional") {
+    disciplina.value = "Curso Profissionalizante";
+    tema.value = "Atendimento ao cliente";
+    publico.value = "Adultos";
+  }
+}
   let tipo = document.getElementById("materiaExemplo").value;
 
   if (tipo === "portugues") {
